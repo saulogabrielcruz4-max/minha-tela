@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TCC+</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --purple: #2d2680;
+      --purple-mid: #534AB7;
+      --purple-light: #a89df5;
+      --purple-pale: #f5f4ff;
+      --purple-soft: #EEEDFE;
+      --green: #2e7d32;
+      --green-bg: #e8f5e9;
+      --orange: #e65100;
+      --orange-bg: #fff3e0;
+      --red: #b71c1c;
+      --red-bg: #fce4e4;
+      --text: #1a1a2e;
+      --text-muted: #6b7280;
+      --border: #e5e7eb;
+      --bg: #f3f4f8;
+      --white: #ffffff;
+      --star: #f59e0b;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 13px;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 210px 1fr 1fr 290px;
+      height: 100vh;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      background: var(--purple);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .logo {
+      padding: 22px 18px 14px;
+      font-size: 17px;
+      font-weight: 600;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo svg { width: 22px; height: 22px; fill: var(--purple-light); flex-shrink: 0; }
+
+    .nav { padding: 0 10px; flex: 1; }
+
+    .nav-section {
+      font-size: 10px;
+      color: var(--purple-light);
+      padding: 14px 8px 4px;
+      letter-spacing: .06em;
+      font-weight: 600;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 8px 10px;
+      border-radius: 7px;
+      color: #c5bef8;
+      cursor: pointer;
+      margin-bottom: 1px;
+      transition: background .15s;
+    }
+
+    .nav-item:hover { background: rgba(255,255,255,.08); }
+    .nav-item.active { background: var(--purple-mid); color: #fff; }
+
+    .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+    .tip {
+      margin: 10px;
+      background: #3c3589;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 11px;
+      color: #c5bef8;
+      line-height: 1.5;
+    }
+
+    .tip strong { color: #fff; display: block; margin-bottom: 3px; }
+
+    .user-row {
+      padding: 12px;
+      border-top: 1px solid rgba(255,255,255,.1);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .avatar {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: var(--purple-light);
+      color: var(--purple);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .avatar.lg { width: 46px; height: 46px; font-size: 14px; }
+
+    .user-name { font-size: 12px; font-weight: 600; color: #fff; }
+    .user-role { font-size: 11px; color: var(--purple-light); }
+
+    /* ── COLUMNS ── */
+    .col {
+      background: var(--white);
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      padding: 18px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .col-title { font-size: 18px; font-weight: 600; color: var(--text); }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 7px 11px;
+    }
+
+    .search-box svg { width: 14px; height: 14px; stroke: var(--text-muted); fill: none; stroke-width: 2; flex-shrink: 0; }
+    .search-box input { border: none; background: transparent; font-size: 12px; color: var(--text); outline: none; width: 100%; font-family: inherit; }
+    .search-box input::placeholder { color: var(--text-muted); }
+
+    .tabs { display: flex; border-bottom: 1px solid var(--border); gap: 0; }
+    .tab { font-size: 12px; padding: 7px 12px; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; transition: color .15s; }
+    .tab.active { color: var(--purple-mid); border-bottom-color: var(--purple-mid); font-weight: 600; }
+
+    .filters { display: flex; gap: 6px; }
+    select {
+      font-size: 12px;
+      padding: 5px 9px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--white);
+      color: var(--text-muted);
+      cursor: pointer;
+      font-family: inherit;
+      outline: none;
+    }
+
+    /* student cards */
+    .student-card {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      cursor: pointer;
+      transition: border-color .15s, box-shadow .15s;
+    }
+
+    .student-card:hover { border-color: var(--purple-mid); box-shadow: 0 2px 8px rgba(83,74,183,.1); }
+    .student-card.active { border-color: var(--purple-mid); background: var(--purple-pale); }
+
+    .sc-top { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; }
+    .sc-info { flex: 1; min-width: 0; }
+    .sc-name { font-size: 13px; font-weight: 600; color: var(--text); }
+    .sc-desc { font-size: 11px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .badge {
+      font-size: 10px;
+      padding: 3px 9px;
+      border-radius: 12px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .badge.green  { background: var(--green-bg);  color: var(--green); }
+    .badge.orange { background: var(--orange-bg); color: var(--orange); }
+    .badge.red    { background: var(--red-bg);    color: var(--red); }
+
+    .prog-row { display: flex; align-items: center; gap: 8px; }
+    .prog-bar { flex: 1; height: 5px; background: #e9ecef; border-radius: 3px; overflow: hidden; }
+    .prog-fill { height: 100%; border-radius: 3px; }
+    .prog-pct { font-size: 11px; color: var(--text-muted); width: 28px; text-align: right; }
+
+    .btn-all {
+      width: 100%;
+      padding: 9px;
+      border: 1px solid var(--purple-mid);
+      border-radius: 8px;
+      color: var(--purple-mid);
+      background: transparent;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background .15s;
+      margin-top: 4px;
+    }
+
+    .btn-all:hover { background: var(--purple-pale); }
+
+    /* ── DETAIL COLUMN ── */
+    .detail-col {
+      background: var(--white);
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      padding: 18px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .back { display: flex; align-items: center; gap: 6px; color: var(--text-muted); font-size: 13px; cursor: pointer; font-weight: 500; }
+    .back svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    .student-hdr { display: flex; align-items: flex-start; gap: 12px; }
+    .student-hdr-info { flex: 1; }
+    .student-hdr-info h2 { font-size: 15px; font-weight: 600; color: var(--text); }
+    .student-hdr-info p { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+
+    .hdr-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 7px; }
+
+    .btn-msg {
+      padding: 7px 14px;
+      background: var(--purple-mid);
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .detail-tabs { display: flex; border-bottom: 1px solid var(--border); }
+    .detail-tab { font-size: 12px; padding: 7px 10px; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; }
+    .detail-tab.active { color: var(--purple-mid); border-bottom-color: var(--purple-mid); font-weight: 600; }
+
+    .section-label { font-size: 14px; font-weight: 600; color: var(--text); }
+
+    .aval-summary {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: var(--bg);
+      border-radius: 10px;
+      padding: 14px;
+    }
+
+    .stars { display: flex; gap: 3px; }
+    .star { font-size: 22px; color: var(--star); }
+    .star.e { color: #d1d5db; }
+    .muito-bom { font-size: 11px; color: var(--green); font-weight: 600; margin-top: 3px; }
+
+    .nota-media { text-align: right; margin-left: auto; }
+    .nota-media .lbl { font-size: 11px; color: var(--text-muted); }
+    .nota-media .num { font-size: 26px; font-weight: 700; color: var(--text); }
+    .nota-media .sub { font-size: 11px; color: var(--text-muted); }
+
+    .criterio { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+    .criterio:last-child { border-bottom: none; }
+
+    .crit-icon { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .crit-icon svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    .crit-info { flex: 1; min-width: 0; }
+    .crit-name { font-size: 12px; font-weight: 600; color: var(--text); }
+    .crit-desc { font-size: 11px; color: var(--text-muted); }
+
+    .stars-sm { display: flex; gap: 2px; }
+    .star-sm { font-size: 13px; color: var(--star); }
+    .star-sm.e { color: #d1d5db; }
+
+    .comment-area {
+      background: var(--bg);
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 12px;
+      color: var(--text);
+      line-height: 1.65;
+    }
+
+    .btn-save {
+      padding: 9px 20px;
+      background: var(--purple-mid);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    /* ── RIGHT COLUMN ── */
+    .right-col {
+      background: var(--white);
+      overflow-y: auto;
+      padding: 18px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .feedback-banner {
+      background: var(--purple-mid);
+      border-radius: 10px;
+      padding: 16px;
+      color: #fff;
+    }
+
+    .feedback-banner h3 { font-size: 14px; font-weight: 600; margin-bottom: 5px; }
+    .feedback-banner p { font-size: 12px; opacity: .85; margin-bottom: 12px; line-height: 1.5; }
+
+    .btn-white {
+      padding: 8px 16px;
+      background: #fff;
+      color: var(--purple-mid);
+      border: none;
+      border-radius: 7px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 12px;
+      color: var(--text);
+      background: var(--white);
+      resize: none;
+      height: 82px;
+      outline: none;
+      font-family: inherit;
+      line-height: 1.5;
+    }
+
+    textarea:focus { border-color: var(--purple-mid); }
+
+    .char { text-align: right; font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+    .btn-send {
+      width: 100%;
+      padding: 10px;
+      background: var(--purple-mid);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn-send svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    .fb-item {
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 11px;
+    }
+
+    .fb-top { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
+
+    .tag {
+      font-size: 10px;
+      padding: 2px 9px;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+
+    .tag.sug { background: var(--green-bg); color: var(--green); }
+    .tag.mel { background: #e3f2fd; color: #1565c0; }
+    .tag.elo { background: #f3e5f5; color: #6a1b9a; }
+    .tag.ana { background: var(--orange-bg); color: var(--orange); }
+    .tag.rep { background: var(--green-bg); color: var(--green); }
+
+    .fb-text { font-size: 12px; color: var(--text); margin-bottom: 3px; line-height: 1.5; }
+    .fb-date { font-size: 11px; color: var(--text-muted); }
+
+    .gauge-wrap { display: flex; align-items: center; gap: 14px; }
+
+    .gauge-num { text-align: center; flex-shrink: 0; }
+    .gauge-num .big { font-size: 24px; font-weight: 700; color: var(--text); }
+    .gauge-num .sub { font-size: 11px; color: var(--text-muted); }
+    .gauge-num .stars-med { display: flex; gap: 2px; margin-top: 4px; justify-content: center; }
+    .gauge-num .star-m { font-size: 15px; color: var(--star); }
+    .gauge-num .star-m.e { color: #d1d5db; }
+
+    .bar-list { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+    .bar-row { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-muted); }
+    .bar-track { flex: 1; height: 5px; background: #e9ecef; border-radius: 3px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 3px; background: var(--purple-mid); }
+    .bar-pct { width: 28px; text-align: right; }
+
+    .thanks {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      background: var(--purple-soft);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 12px;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .thanks svg { width: 16px; height: 16px; stroke: var(--purple-mid); fill: none; stroke-width: 2; flex-shrink: 0; margin-top: 1px; }
+  </style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">
+      <svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5-10-5z"/><path d="M6 12v5c0 1.657 2.686 3 6 3s6-1.343 6-3v-5"/></svg>
+      TCC+
+    </div>
+
+    <nav class="nav">
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Início
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Meu TCC
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Planejamento
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Editor
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+        Referências
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        Verificação
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Progresso
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        Mensagens
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Calendário
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+        Arquivos
+      </div>
+
+      <div class="nav-section">PROFESSOR</div>
+
+      <div class="nav-item active">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        Acompanhar Alunos
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Turmas
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Avaliações
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        Relatórios
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        Feedback para o App
+      </div>
+    </nav>
+
+    <div class="tip">
+      <strong>💡 Dica do dia</strong>
+      Acompanhar de perto faz toda a diferença no sucesso do aluno!
+    </div>
+
+    <div class="user-row">
+      <div class="avatar">AS</div>
+      <div>
+        <div class="user-name">Prof. Ana Silva</div>
+        <div class="user-role">Orientadora</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- COLUNA: LISTA DE ALUNOS -->
+  <div class="col">
+    <div class="col-title">Acompanhar Alunos</div>
+
+    <div class="search-box">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Buscar aluno ou TCC...">
+    </div>
+
+    <div class="tabs">
+      <div class="tab active">Todos os alunos</div>
+      <div class="tab">Meus orientandos</div>
+      <div class="tab">Por turma</div>
+    </div>
+
+    <div class="filters">
+      <select><option>Todas as etapas</option><option>Introdução</option><option>Desenvolvimento</option><option>Conclusão</option></select>
+      <select><option>Todos os anos</option><option>2024</option><option>2025</option></select>
+    </div>
+
+    <div class="student-card active">
+      <div class="sc-top">
+        <div class="avatar" style="background:#a89df5;color:#2d2680">JP</div>
+        <div class="sc-info">
+          <div class="sc-name">Juliana Pereira</div>
+          <div class="sc-desc">Desenvolvimento de um app educacional...</div>
+        </div>
+        <span class="badge green">No prazo</span>
+      </div>
+      <div class="prog-row">
+        <div class="prog-bar"><div class="prog-fill" style="width:65%;background:#534AB7"></div></div>
+        <span class="prog-pct">65%</span>
+      </div>
+    </div>
+
+    <div class="student-card">
+      <div class="sc-top">
+        <div class="avatar" style="background:#b5d4f4;color:#185FA5">LM</div>
+        <div class="sc-info">
+          <div class="sc-name">Lucas Martins</div>
+          <div class="sc-desc">Análise do impacto das redes sociais...</div>
+        </div>
+        <span class="badge orange">Em andamento</span>
+      </div>
+      <div class="prog-row">
+        <div class="prog-bar"><div class="prog-fill" style="width:40%;background:#f59e0b"></div></div>
+        <span class="prog-pct">40%</span>
+      </div>
+    </div>
+
+    <div class="student-card">
+      <div class="sc-top">
+        <div class="avatar" style="background:#f5c4b3;color:#993C1D">MS</div>
+        <div class="sc-info">
+          <div class="sc-name">Mariana Souza</div>
+          <div class="sc-desc">Gamificação no ensino superior...</div>
+        </div>
+        <span class="badge red">Atrasado</span>
+      </div>
+      <div class="prog-row">
+        <div class="prog-bar"><div class="prog-fill" style="width:25%;background:#e24b4a"></div></div>
+        <span class="prog-pct">25%</span>
+      </div>
+    </div>
+
+    <div class="student-card">
+      <div class="sc-top">
+        <div class="avatar" style="background:#9FE1CB;color:#085041">RO</div>
+        <div class="sc-info">
+          <div class="sc-name">Rafael Oliveira</div>
+          <div class="sc-desc">Sustentabilidade em pequenas empresas...</div>
+        </div>
+        <span class="badge green">No prazo</span>
+      </div>
+      <div class="prog-row">
+        <div class="prog-bar"><div class="prog-fill" style="width:70%;background:#1D9E75"></div></div>
+        <span class="prog-pct">70%</span>
+      </div>
+    </div>
+
+    <div class="student-card">
+      <div class="sc-top">
+        <div class="avatar" style="background:#C0DD97;color:#3B6D11">BL</div>
+        <div class="sc-info">
+          <div class="sc-name">Beatriz Lima</div>
+          <div class="sc-desc">Inteligência artificial na educação...</div>
+        </div>
+        <span class="badge orange">Em andamento</span>
+      </div>
+      <div class="prog-row">
+        <div class="prog-bar"><div class="prog-fill" style="width:55%;background:#f59e0b"></div></div>
+        <span class="prog-pct">55%</span>
+      </div>
+    </div>
+
+    <button class="btn-all">Ver todos os alunos</button>
+  </div>
+
+  <!-- COLUNA: DETALHES DO ALUNO -->
+  <div class="detail-col">
+    <div class="back">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Detalhes do Aluno
+    </div>
+
+    <div class="student-hdr">
+      <div class="avatar lg" style="background:#a89df5;color:#2d2680">JP</div>
+      <div class="student-hdr-info">
+        <h2>Juliana Pereira</h2>
+        <p>juliana.pereira@email.com</p>
+        <p>Turma: TCC 2024/1</p>
+      </div>
+      <div class="hdr-actions">
+        <span class="badge green">No prazo</span>
+        <button class="btn-msg">Enviar mensagem</button>
+      </div>
+    </div>
+
+    <div class="detail-tabs">
+      <div class="detail-tab">Visão Geral</div>
+      <div class="detail-tab">Progresso</div>
+      <div class="detail-tab active">Avaliações</div>
+      <div class="detail-tab">Arquivos</div>
+      <div class="detail-tab">Conversas</div>
+    </div>
+
+    <div class="section-label">Avaliação do Desempenho</div>
+
+    <div class="aval-summary">
+      <div>
+        <div class="stars">
+          <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star e">★</span>
+        </div>
+        <div class="muito-bom">Muito bom</div>
+      </div>
+      <div class="nota-media">
+        <div class="lbl">Nota média</div>
+        <div class="num">4,2</div>
+        <div class="sub">de 5,0</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="criterio">
+        <div class="crit-icon" style="background:var(--green-bg);color:var(--green)">
+          <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div class="crit-info">
+          <div class="crit-name">Cumprimento de prazos</div>
+          <div class="crit-desc">Entrega das etapas dentro do prazo estabelecido.</div>
+        </div>
+        <div class="stars-sm"><span class="star-sm">★</span><span class="star-sm">★</span><span class="star-sm">★</span><span class="star-sm">★</span><span class="star-sm e">★</span></div>
+      </div>
+      <div class="criterio">
+        <div class="crit-icon" style="background:#e3f2fd;color:#1565c0">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <div class="crit-info">
+          <div class="crit-name">Qualidade do conteúdo</div>
+          <div class="crit-desc">Coerência, relevância e profundidade do conteúdo.</div>
+        </div>
+        <div class="stars-sm"><span class="star-sm">★</span><span class="star-sm">★</span><span class="star-sm">★</span><span class="star-sm">★</span><span class="star-sm e">★</span></div>
+      </div>
+      <div class="criterio">
+        <div class="crit-icon" style="background:var(--red-bg);color:var(--red)">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <div class="crit-info">
+          <div class="crit-name">Metodologia aplicada</div>
+          <div class="crit-desc">Aplicação correta dos métodos e técnicas.</div>
+        </div>
+        <div class="stars-sm"><span class="star-sm">★</span><span class="star-sm">★</span><span class="star-sm">★</span><span class="star-sm">★</span><span class="star-sm">★</span></div>
+      </div>
+      <div class="criterio">
+        <div class="crit-icon" style="background:var(--orange-bg);color:var(--orange)">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        </div>
+        <div class="crit-info">
+          <div class="crit-name">Capacidade de análise</div>
+          <div class="crit-desc">Análise crítica e interpretação dos dados.</div>
+        </div>
+        <div class="stars-sm"><span class="star-sm">★</span><span class="star-sm">★</span><span class="star-sm">★</span><span class="star-sm">★</span><span class="star-sm e">★</span></div>
+      </div>
+      <div class="criterio">
+        <div class="crit-icon" style="background:#f3e5f5;color:#6a1b9a">
+          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+        </div>
+        <div class="crit-info">
+          <div class="crit-name">Engajamento e dedicação</div>
+          <div class="crit-desc">Participação, comunicação e dedicação ao TCC.</div>
+        </div>
+        <div class="stars-sm"><span class="star-sm">★</span><span class="star-sm">★</span><span class="star-sm">★</span><span class="star-sm">★</span><span class="star-sm e">★</span></div>
+      </div>
+    </div>
+
+    <div class="section-label">Comentários para o aluno</div>
+    <div class="comment-area">
+      <p>Juliana, seu trabalho está muito bem estruturado e com excelente profundidade teórica. Continue assim!</p>
+      <p style="margin-top:8px">Sugiro apenas aprofundar um pouco mais na análise dos dados da pesquisa.</p>
+    </div>
+    <button class="btn-save">Salvar comentário</button>
+  </div>
+
+  <!-- COLUNA: FEEDBACK -->
+  <div class="right-col">
+    <div class="feedback-banner">
+      <h3>Sua opinião é importante! 💬</h3>
+      <p>Ajude-nos a melhorar o TCC+. Deixe seu feedback e sugestões para continuarmos evoluindo.</p>
+      <button class="btn-white">Enviar feedback</button>
+    </div>
+
+    <div class="section-label">Deixe seu feedback para os donos do app</div>
+
+    <div>
+      <textarea placeholder="Compartilhe sua experiência, sugestões de melhorias, novas funcionalidades ou qualquer outra opinião..." id="fb" oninput="document.getElementById('chars').textContent=this.value.length+'/500'"></textarea>
+      <div class="char" id="chars">0/500</div>
+    </div>
+
+    <button class="btn-send">
+      <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      Enviar feedback
+    </button>
+
+    <div class="section-label">Feedbacks enviados</div>
+
+    <div class="fb-item">
+      <div class="fb-top">
+        <span class="tag sug">Sugestão</span>
+        <span class="tag ana" style="margin-left:auto">Em análise</span>
+      </div>
+      <div class="fb-text">Seria ótimo ter um modelo de capa ABNT automático.</div>
+      <div class="fb-date">Enviado em 15/05/2024</div>
+    </div>
+
+    <div class="fb-item">
+      <div class="fb-top">
+        <span class="tag mel">Melhoria</span>
+        <span class="tag ana" style="margin-left:auto">Em análise</span>
+      </div>
+      <div class="fb-text">Incluir integração com Google Acadêmico seria excelente.</div>
+      <div class="fb-date">Enviado em 02/05/2024</div>
+    </div>
+
+    <div class="fb-item">
+      <div class="fb-top">
+        <span class="tag elo">Elogio</span>
+        <span class="tag rep" style="margin-left:auto">Respondido</span>
+      </div>
+      <div class="fb-text">O aplicativo é completo e intuitivo. Parabéns!</div>
+      <div class="fb-date">Enviado em 18/04/2024</div>
+    </div>
+
+    <div class="section-label">Satisfação com o TCC+</div>
+
+    <div class="gauge-wrap">
+      <div class="gauge-num">
+        <div class="big">4,6</div>
+        <div class="sub">de 5,0</div>
+        <div class="stars-med">
+          <span class="star-m">★</span><span class="star-m">★</span><span class="star-m">★</span><span class="star-m">★</span><span class="star-m e">★</span>
+        </div>
+      </div>
+      <div class="bar-list">
+        <div class="bar-row">5 estrelas <div class="bar-track"><div class="bar-fill" style="width:68%"></div></div><span class="bar-pct">68%</span></div>
+        <div class="bar-row">4 estrelas <div class="bar-track"><div class="bar-fill" style="width:24%"></div></div><span class="bar-pct">24%</span></div>
+        <div class="bar-row">3 estrelas <div class="bar-track"><div class="bar-fill" style="width:6%"></div></div><span class="bar-pct">6%</span></div>
+        <div class="bar-row">2 estrelas <div class="bar-track"><div class="bar-fill" style="width:1%"></div></div><span class="bar-pct">1%</span></div>
+        <div class="bar-row">1 estrela  <div class="bar-track"><div class="bar-fill" style="width:1%"></div></div><span class="bar-pct">1%</span></div>
+      </div>
+    </div>
+
+    <div class="thanks">
+      <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+      <div><strong>Agradecemos seu feedback!</strong><br>Sua contribuição nos ajuda a tornar o TCC+ cada vez melhor.</div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
